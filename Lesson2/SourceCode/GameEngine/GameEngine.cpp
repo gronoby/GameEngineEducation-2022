@@ -11,6 +11,7 @@
 #include "RenderThread.h"
 #include "CubeGameObject.h"
 #include "GameTimer.h"
+#include "INIReader.h"
 
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -35,7 +36,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     timer.Start();
     timer.Reset();
-
+    INIReader reader("../actionmap.ini");
+    if (reader.ParseError() < 0) {
+        return 1;
+    }
+    const std::string Left = reader.Get("Keyboard", "GoLeft", "A");
+    const char codeLeft = toupper(Left[0]);
+    const std::string Right = reader.Get("Keyboard", "GoRight", "D");
+    const char codeRight = toupper(Right[0]);
+    float speed = 0.f;
+    
     // Main message loop:
     while (msg.message != (WM_QUIT | WM_CLOSE))
     {
@@ -43,14 +53,24 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
+            
         }
         else
         {
-            float t = 0;
-            timer.Tick();
-            t = sin(timer.TotalTime())*2;
-            cube->SetPosition(t, 0.0f, 0.0f);
 
+            if (GetAsyncKeyState(codeLeft) & 0x8000)
+            {
+                speed = -1.f;
+            }
+            else if (GetAsyncKeyState(codeRight) & 0x8000) {
+                speed = 1.f;
+            }
+
+            float t = 0.f;
+            timer.Tick();
+            t = sin(timer.TotalTime()) * 2;
+            cube->AddPosition(speed * timer.DeltaTime(), 0.0f, 0.0f);
+            speed = 0.f;
             renderThread->OnEndFrame();
         }
     }

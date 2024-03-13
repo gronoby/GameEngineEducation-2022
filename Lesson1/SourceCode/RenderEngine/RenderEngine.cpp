@@ -1,5 +1,5 @@
 #include <bx/math.h>
-
+#include <bx/timer.h>
 #include "RenderEngine.h"
 
 LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -34,6 +34,8 @@ CRenderEngine::CRenderEngine(HINSTANCE hInstance)
 	bgfx::setViewRect(0, 0, 0, bgfx::BackbufferRatio::Equal);
 
 	m_defaultCube = new Cube();
+	m_defaultpyramid = new Pyramid();
+	timeStart = bx::getHPCounter();
 }
 
 CRenderEngine::~CRenderEngine()
@@ -93,6 +95,8 @@ HWND CRenderEngine::InitMainWindow(HINSTANCE hInstance)
 
 void CRenderEngine::Update()
 {
+	float time = (float)((bx::getHPCounter() - timeStart) / double(bx::getHPFrequency()));
+	float x = 2.f * sinf(time);
 	const bx::Vec3 at = { 0.0f, 0.0f,  0.0f };
 	const bx::Vec3 eye = { 0.0f, 10.0f, -5.0f };
 	float view[16];
@@ -101,10 +105,14 @@ void CRenderEngine::Update()
 	bx::mtxProj(proj, 60.0f, float(m_Width) / float(m_Height), 0.1f, 100.0f, bgfx::getCaps()->homogeneousDepth);
 	bgfx::setViewTransform(0, view, proj);
 
-	bgfx::setVertexBuffer(0, m_defaultCube->GetVertexBuffer());
-	bgfx::setIndexBuffer(m_defaultCube->GetIndexBuffer());
+	bgfx::setVertexBuffer(0, m_defaultpyramid->GetVertexBuffer());
+	bgfx::setIndexBuffer(m_defaultpyramid->GetIndexBuffer());
 
-	bgfx::submit(0, m_defaultCube->GetProgramHandle());
+	float transformmatrix[16];
+	bx::mtxTranslate(transformmatrix, x, 0.f, 0.f);
+	bgfx::setTransform(transformmatrix);
+
+	bgfx::submit(0, m_defaultpyramid->GetProgramHandle());
 
 	bgfx::touch(0);
 

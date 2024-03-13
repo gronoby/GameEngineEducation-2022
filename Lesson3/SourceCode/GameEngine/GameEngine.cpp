@@ -30,15 +30,25 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     RenderThread* renderThread = renderEngine->GetRT();
     InputHandler* inputHandler = new InputHandler();
 
-    GameObject* cube = new CubeGameObject();
-    renderThread->EnqueueCommand(RC_CreateCubeRenderObject, cube->GetRenderProxy());
-
     MSG msg = { 0 };
 
     timer.Start();
     timer.Reset();
 
-    float newPositionX = 0.0f;
+
+    CubeGameObject* objects[100];
+    for (int i = 0; i < 100; i++) {
+        int a = rand() % 3;
+        if (a == 0)
+            objects[i] = new MoveCube();
+        else if (a == 1)
+            objects[i] = new JumpCube();
+        else {
+            objects[i] = new ControledCube();
+        }
+        renderThread->EnqueueCommand(RC_CreateCubeRenderObject, objects[i]->GetRenderProxy());
+        objects[i]->SetPosition(6.0f * (i % 10) - 25.f, -50.0f, (i / 10) * 6.f);
+    }
 
     // Main message loop:
     while (msg.message != (WM_QUIT | WM_CLOSE))
@@ -51,18 +61,18 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         else
         {
             inputHandler->Update();
-
-            float t = 0;
             timer.Tick();
-            t = sin(timer.TotalTime())*2;
-
-            float velocity = 0.0f;
-            if (inputHandler->GetInputState().test(eIC_GoLeft))
-                velocity -= 1.0f;
-            if (inputHandler->GetInputState().test(eIC_GoRight))
-                velocity += 1.0f;
-            newPositionX += velocity * timer.DeltaTime();
-            cube->SetPosition(newPositionX, 0.0f, 0.0f);
+            
+            for (auto& object : objects) {
+                object->Move(timer.TotalTime());
+                object->Jump(timer.TotalTime());
+                if (inputHandler->GetInputState().test(eIC_GoRight)) {
+                    object->Control(timer.DeltaTime(), eIC_GoRight);
+                }
+                if (inputHandler->GetInputState().test(eIC_GoLeft)) {
+                    object->Control(timer.DeltaTime(), eIC_GoLeft);
+                }
+            }
 
             renderThread->OnEndFrame();
         }
