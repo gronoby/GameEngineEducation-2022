@@ -35,6 +35,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     timer.Start();
     timer.Reset();
 
+    srand(time(0));
 
     CubeGameObject* objects[100];
     for (int i = 0; i < 100; i++) {
