@@ -70,7 +70,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             else if (GetAsyncKeyState(codeRight) & 0x8000) {
                 speedx = 1.f;
             }
-            else if (GetAsyncKeyState(codeUp) & 0x8000) {
+            if (GetAsyncKeyState(codeUp) & 0x8000) {
                 speedy = 1.f;
             }
             else if (GetAsyncKeyState(codeDown) & 0x8000) {
