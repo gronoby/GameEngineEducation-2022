@@ -33,7 +33,8 @@ void JumpCube::Jump(float time)
 		start[2] = m_vPosition[2];
 	}
 
-	float change = (20 * time) - (0.5f * 9.8f * time * time);
+	
+	float change = - (time - floor(time) - 1) * (time - floor(time)) * 30.f;
 	SetPosition(start[0], start[1] + change, start[2]);
 }
 
