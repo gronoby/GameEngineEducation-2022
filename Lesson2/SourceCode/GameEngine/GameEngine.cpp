@@ -76,7 +76,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             else if (GetAsyncKeyState(codeDown) & 0x8000) {
                 speedy = -1.f;
             }
-
+            if (speedx * speedy != 0) {
+                speedx = speedx * 0.5;
+                speedy = speedy * 0.5;
+            }
             float t = 0.f;
             timer.Tick();
             t = sin(timer.TotalTime()) * 2;
