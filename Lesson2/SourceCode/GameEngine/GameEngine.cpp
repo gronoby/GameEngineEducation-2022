@@ -44,7 +44,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     const char codeLeft = toupper(Left[0]);
     const std::string Right = reader.Get("Keyboard", "GoRight", "D");
     const char codeRight = toupper(Right[0]);
-    float speed = 0.f;
+    const std::string Up = reader.Get("Keyboard", "GoUp", "W");
+    const char codeUp = toupper(Up[0]);
+    const std::string Down = reader.Get("Keyboard", "GoDown", "S");
+    const char codeDown = toupper(Down[0]);
+    float speedx = 0.f;
+    float speedy = 0.f;
     
     // Main message loop:
     while (msg.message != (WM_QUIT | WM_CLOSE))
@@ -60,17 +65,24 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
             if (GetAsyncKeyState(codeLeft) & 0x8000)
             {
-                speed = -1.f;
+                speedx = -1.f;
             }
             else if (GetAsyncKeyState(codeRight) & 0x8000) {
-                speed = 1.f;
+                speedx = 1.f;
+            }
+            else if (GetAsyncKeyState(codeUp) & 0x8000) {
+                speedy = 1.f;
+            }
+            else if (GetAsyncKeyState(codeDown) & 0x8000) {
+                speedy = -1.f;
             }
 
             float t = 0.f;
             timer.Tick();
             t = sin(timer.TotalTime()) * 2;
-            cube->AddPosition(speed * timer.DeltaTime(), 0.0f, 0.0f);
-            speed = 0.f;
+            cube->AddPosition(speedx * timer.DeltaTime(), 0.0f, speedy * timer.DeltaTime());
+            speedx = 0.f;
+            speedy = 0.f;
             renderThread->OnEndFrame();
         }
     }
