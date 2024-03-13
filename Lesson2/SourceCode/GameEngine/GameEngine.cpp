@@ -77,8 +77,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                 speedy = -1.f;
             }
             if (speedx * speedy != 0) {
-                speedx = speedx * 0.5;
-                speedy = speedy * 0.5;
+                speedx = speedx * 0.707;
+                speedy = speedy * 0.707;
             }
             float t = 0.f;
             timer.Tick();
